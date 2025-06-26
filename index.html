@@ -1,1 +1,599 @@
 
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תרגול אוצר מילים</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            direction: rtl;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 10px 10px 0 0;
+            margin-left: 5px;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .quiz-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .quiz-card.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .quiz-card.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        .english-word {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            direction: ltr;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            direction: rtl;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        input[type="text"].english {
+            direction: ltr;
+        }
+        button {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+        .feedback {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .correct-answer {
+            color: #28a745;
+        }
+        .incorrect-answer {
+            color: #dc3545;
+        }
+        .score {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .controls button {
+            margin: 0 5px;
+        }
+        .next-btn {
+            background: #28a745;
+        }
+        .next-btn:hover {
+            background: #218838;
+        }
+        .reset-btn {
+            background: #6c757d;
+        }
+        .reset-btn:hover {
+            background: #5a6268;
+        }
+        .add-word-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .add-word-form h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: flex-end;
+        }
+        .form-group {
+            flex: 1;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .add-btn {
+            background: #28a745;
+        }
+        .add-btn:hover {
+            background: #218838;
+        }
+        .word-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+        .word-item:last-child {
+            border-bottom: none;
+        }
+        .word-item:hover {
+            background: #f8f9fa;
+        }
+        .word-pair {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .english-text {
+            direction: ltr;
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 120px;
+        }
+        .hebrew-text {
+            color: #666;
+        }
+        .delete-btn {
+            background: #dc3545;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .word-count {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 16px;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-size: 18px;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>תרגול אוצר מילים אנגלית-עברית</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('quiz')">תרגול</button>
+            <button class="tab" onclick="showTab('manage')">ניהול מילים</button>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz-tab" class="tab-content active">
+            <div class="score">
+                ניקוד: <span id="score">0</span> / <span id="total">0</span>
+            </div>
+
+            <div class="controls">
+                <button onclick="nextWord()" class="next-btn">המילה הבאה</button>
+                <button onclick="resetQuiz()" class="reset-btn">התחל מחדש</button>
+            </div>
+
+            <div id="quiz-container">
+                <div class="quiz-card" id="quizCard">
+                    <div class="english-word" id="englishWord"></div>
+                    <div class="input-container">
+                        <input type="text" id="hebrewInput" placeholder="כתוב את התרגום בעברית...">
+                        <button onclick="checkAnswer()">בדוק</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Words Tab -->
+        <div id="manage-tab" class="tab-content">
+            <div class="add-word-form">
+                <h3>הוספת מילה חדשה</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>מילה באנגלית:</label>
+                        <input type="text" id="englishInput" class="english" placeholder="English word">
+                    </div>
+                    <div class="form-group">
+                        <label>תרגום בעברית:</label>
+                        <input type="text" id="hebrewTranslation" placeholder="תרגום עברי">
+                    </div>
+                    <button onclick="addWord()" class="add-btn">הוסף מילה</button>
+                </div>
+            </div>
+
+            <div class="word-count">
+                סה"כ מילים: <span id="wordCount">0</span>
+            </div>
+
+            <div class="word-list" id="wordList">
+                <div class="empty-state">אין מילים ברשימה</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default vocabulary
+        const defaultVocabulary = [
+            { english: "decades", hebrew: "עשורים" },
+            { english: "past", hebrew: "עבר" },
+            { english: "significant", hebrew: "משמעותי" },
+            { english: "increase", hebrew: "עלייה" },
+            { english: "half", hebrew: "חצי" },
+            { english: "population", hebrew: "אוכלוסייה" },
+            { english: "third", hebrew: "שליש" },
+            { english: "rising", hebrew: "עולה" },
+            { english: "urban", hebrew: "עירוני" },
+            { english: "often", hebrew: "לעיתים קרובות" },
+            { english: "environmental", hebrew: "סביבתי" },
+            { english: "few", hebrew: "כמה" }
+        ];
+
+        let vocabulary = [];
+        let currentWordIndex = 0;
+        let score = 0;
+        let totalAttempts = 0;
+        let answered = false;
+
+        // Storage functions using localStorage
+        function saveVocabulary() {
+            try {
+                localStorage.setItem('vocabularyWords', JSON.stringify(vocabulary));
+                console.log('Vocabulary saved to localStorage');
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+                showMessage('שגיאה בשמירת המילים', 'error');
+            }
+        }
+
+        function loadVocabulary() {
+            try {
+                const saved = localStorage.getItem('vocabularyWords');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading from localStorage:', e);
+            }
+            return [...defaultVocabulary];
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = text;
+            
+            const container = document.querySelector('#manage-tab .add-word-form');
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // Tab functions
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'manage') {
+                renderWordList();
+            }
+        }
+
+        // Word management functions
+        function addWord() {
+            const englishWord = document.getElementById('englishInput').value.trim();
+            const hebrewWord = document.getElementById('hebrewTranslation').value.trim();
+
+            if (!englishWord || !hebrewWord) {
+                showMessage('אנא מלא את שני השדות', 'error');
+                return;
+            }
+
+            // Check if word already exists
+            const exists = vocabulary.some(word => 
+                word.english.toLowerCase() === englishWord.toLowerCase()
+            );
+
+            if (exists) {
+                showMessage('המילה כבר קיימת ברשימה', 'error');
+                return;
+            }
+
+            vocabulary.push({ english: englishWord, hebrew: hebrewWord });
+            saveVocabulary();
+            
+            // Clear inputs
+            document.getElementById('englishInput').value = '';
+            document.getElementById('hebrewTranslation').value = '';
+            
+            renderWordList();
+            showMessage('המילה נוספה בהצלחה!', 'success');
+        }
+
+        function deleteWord(index) {
+            if (confirm('האם אתה בטוח שברצונך למחוק את המילה הזו?')) {
+                vocabulary.splice(index, 1);
+                saveVocabulary();
+                renderWordList();
+                
+                // Reset quiz if currently running
+                if (vocabulary.length === 0) {
+                    document.getElementById('quiz-container').innerHTML = 
+                        '<div class="empty-state">אין מילים לתרגול. אנא הוסף מילים בלשונית "ניהול מילים"</div>';
+                } else {
+                    resetQuiz();
+                }
+                
+                showMessage('המילה נמחקה בהצלחה', 'success');
+            }
+        }
+
+        function renderWordList() {
+            const wordList = document.getElementById('wordList');
+            const wordCount = document.getElementById('wordCount');
+            
+            wordCount.textContent = vocabulary.length;
+
+            if (vocabulary.length === 0) {
+                wordList.innerHTML = '<div class="empty-state">אין מילים ברשימה</div>';
+                return;
+            }
+
+            const html = vocabulary.map((word, index) => `
+                <div class="word-item">
+                    <div class="word-pair">
+                        <span class="english-text">${word.english}</span>
+                        <span class="hebrew-text">${word.hebrew}</span>
+                    </div>
+                    <button onclick="deleteWord(${index})" class="delete-btn">מחק</button>
+                </div>
+            `).join('');
+
+            wordList.innerHTML = html;
+        }
+
+        // Quiz functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function initQuiz() {
+            if (vocabulary.length === 0) {
+                document.getElementById('quiz-container').innerHTML = 
+                    '<div class="empty-state">אין מילים לתרגול. אנא הוסף מילים בלשונית "ניהול מילים"</div>';
+                return;
+            }
+
+            shuffleArray(vocabulary);
+            currentWordIndex = 0;
+            score = 0;
+            totalAttempts = 0;
+            answered = false;
+            
+            // Restore quiz interface if it was replaced
+            if (!document.getElementById('quizCard')) {
+                document.getElementById('quiz-container').innerHTML = `
+                    <div class="quiz-card" id="quizCard">
+                        <div class="english-word" id="englishWord"></div>
+                        <div class="input-container">
+                            <input type="text" id="hebrewInput" placeholder="כתוב את התרגום בעברית...">
+                            <button onclick="checkAnswer()">בדוק</button>
+                        </div>
+                        <div class="feedback" id="feedback"></div>
+                    </div>
+                `;
+                // Re-add event listener
+                document.getElementById('hebrewInput').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        if (!answered) {
+                            checkAnswer();
+                        } else {
+                            nextWord();
+                        }
+                    }
+                });
+            }
+            
+            showCurrentWord();
+            updateScore();
+        }
+
+        function showCurrentWord() {
+            if (!vocabulary.length) return;
+            
+            const word = vocabulary[currentWordIndex];
+            document.getElementById('englishWord').textContent = word.english;
+            document.getElementById('hebrewInput').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('quizCard').className = 'quiz-card';
+            document.getElementById('hebrewInput').focus();
+            answered = false;
+        }
+
+        function checkAnswer() {
+            if (answered || !vocabulary.length) return;
+            
+            const userAnswer = document.getElementById('hebrewInput').value.trim();
+            const correctAnswer = vocabulary[currentWordIndex].hebrew;
+            const feedbackElement = document.getElementById('feedback');
+            const cardElement = document.getElementById('quizCard');
+            
+            totalAttempts++;
+            answered = true;
+
+            if (userAnswer === correctAnswer) {
+                feedbackElement.innerHTML = '<span class="correct-answer">✓ נכון!</span>';
+                cardElement.className = 'quiz-card correct';
+                score++;
+            } else {
+                feedbackElement.innerHTML = `<span class="incorrect-answer">✗ לא נכון</span><br><span class="correct-answer">התשובה הנכונה: ${correctAnswer}</span>`;
+                cardElement.className = 'quiz-card incorrect';
+            }
+            
+            updateScore();
+        }
+
+        function nextWord() {
+            if (!vocabulary.length) return;
+            currentWordIndex = (currentWordIndex + 1) % vocabulary.length;
+            showCurrentWord();
+        }
+
+        function resetQuiz() {
+            initQuiz();
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('total').textContent = totalAttempts;
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load vocabulary from localStorage
+            vocabulary = loadVocabulary();
+            
+            // Initialize quiz
+            initQuiz();
+            
+            // Add Enter key listeners
+            document.getElementById('hebrewInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (!answered) {
+                        checkAnswer();
+                    } else {
+                        nextWord();
+                    }
+                }
+            });
+
+            document.getElementById('englishInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('hebrewTranslation').focus();
+                }
+            });
+
+            document.getElementById('hebrewTranslation').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addWord();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
